@@ -54,7 +54,7 @@ General Stuff
 
 // Get all white elements and make them grey
 %hook UIView
-- (void) setBackgroundColor:(UIColor *)arg1
+- (void) setBackgroundColor:(UIColor *)_
 {
     %orig;
     
