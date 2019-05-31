@@ -1,0 +1,9 @@
+Package: com.shepgoba.darkphone12
+Name: DarkPhone12
+Depends: mobilesubstrate
+Version: 0.0.1
+Architecture: iphoneos-arm
+Description: Full dark mode for the phone app! (iOS 12)
+Maintainer: shepgoba
+Author: shepgoba
+Section: Tweaks
