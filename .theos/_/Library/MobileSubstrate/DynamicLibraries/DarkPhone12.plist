@@ -1,2 +1,2 @@
-{ Filter = { Bundles = ( "com.apple.TelephonyUI" ); }; }
+{ Filter = { Bundles = ( "com.apple.mobilephone" ); }; }
 

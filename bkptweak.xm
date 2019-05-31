@@ -1,25 +1,11 @@
-#define UIColorMake(r, g, b, a) [UIColor colorWithRed:r/255.0f green:g/255.0f blue:b/255.0f alpha:a]
-#define PHONE_GREY UIColorMake(25, 25, 25, 1)
-
-
-
-@interface PhoneBackgroundRecents : UIView
-@end
-
 %group Tweak
-
-/*
-
-General Stuff
-
-*/
+//Set background for top and bottom bars
 %hook _UIVisualEffectSubview
 - (void) setBackgroundColor:(id)arg1
 {
     %orig(PHONE_GREY);
 }
 %end
-
 %hook _UINavigationBarContentView
 - (void) setTextColor:(UIColor *)arg1 
 {
@@ -41,7 +27,6 @@ General Stuff
     %orig([UIColor grayColor]);
 }
 %end
-
 /*
 
 Favorites Tab 
@@ -60,7 +45,7 @@ Recents Tab
 
 */
 
-/*%hook UIView ()
+/*%hook UIView
 -(void) setBackgroundColor:(id)arg1
 {
     %orig(PHONE_GREY);
@@ -104,9 +89,13 @@ Keypad tab
     {
         return 1.0;
     }
+    -(UIColor *)color
+    {
+        return [UIColor whiteColor];
+    }
     -(UIColor *)buttonColor
     {
-        return UIColorMake(120, 120, 120, 1);
+        return UIColorMake(100, 100, 100, 1);
     }
 %end
 
@@ -116,14 +105,8 @@ Keypad tab
     %orig([UIColor whiteColor]);
 }
 %end
-
 /*
 Voicemail 
 */
 
 %end
-
-%ctor
-{
-    %init(Tweak);
-}
