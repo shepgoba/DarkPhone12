@@ -2,10 +2,6 @@
 #define PHONE_GREY UIColorMake(25, 25, 25, 1)
 
 
-
-@interface PhoneBackgroundRecents : UIView
-@end
-
 %group Tweak
 
 /*
