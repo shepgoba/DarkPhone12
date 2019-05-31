@@ -23,20 +23,6 @@ General Stuff
 }
 %end
 
-%hook _UINavigationBarLargeTitleView
--(void)setTitle:(NSString *)arg1 
-{
-    %orig(arg1);
-    self.accessibilityTitleView.textColor = [UIColor whiteColor];
-}
-%end
-
-%hook UILabel
-- (void) setTextColor:(UIColor *)arg1
-{
-    %orig([UIColor grayColor]);
-}
-%end
 
 /*
 
