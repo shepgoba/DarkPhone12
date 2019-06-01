@@ -5,13 +5,38 @@ DarkPhone12
 Copyright (C) shepgoba 2019
 */
 
-
-
 #import <substrate.h>
 #import "DarkPhone12.h"
 
-//TODO: add prefs
-BOOL enabled = NO;
+BOOL enabled, trueBlackEnabled;
+
+UIColor* PHONE_GREY = UIColorMake(25, 25, 25, 1);
+UIColor* CELL_GREY = UIColorMake(35, 35, 35, 1);
+
+static void initPrefs() {
+	NSFileManager *fileManager = [NSFileManager defaultManager];
+
+	if (![fileManager fileExistsAtPath:PREFS_PATH]) {
+		[fileManager copyItemAtPath:PREFS_DEFAULT_PATH toPath:PREFS_PATH error:nil];
+	}
+}
+
+static void loadPrefs()
+{
+    NSDictionary *prefs = [NSMutableDictionary dictionaryWithContentsOfFile:PREFS_PATH];
+
+    if (prefs)
+    {
+        enabled = [prefs objectForKey:@"enabled"] ? [[prefs objectForKey:@"enabled"] boolValue] : YES;
+        trueBlackEnabled = [prefs objectForKey:@"trueBlackEnabled"] ? [[prefs objectForKey:@"trueBlackEnabled"] boolValue] : YES;
+    }
+    if (trueBlackEnabled)
+    {
+        PHONE_GREY = UIColorMake(0, 0, 0, 1);
+        CELL_GREY = [UIColor clearColor];
+    }
+}
+
 
 //https://stackoverflow.com/questions/970475/how-to-compare-uicolors, by samvermette
 BOOL colorIsEqualToColorWithTolerance(UIColor *color1, UIColor *color2, CGFloat tolerance)
@@ -32,6 +57,9 @@ BOOL colorIsEqualToColorWithTolerance(UIColor *color1, UIColor *color2, CGFloat 
 General Stuff
 
 */
+
+%group Tweak
+
 %hook UICollectionView
 
     /* Makes tableviews look a lot cleaner */
@@ -79,7 +107,7 @@ General Stuff
 
 // Get all white elements and make them grey
 %hook UIView
-    - (void) setBackgroundColor:(UIColor *)_
+    - (void) setBackgroundColor:(UIColor *)arg1
     {
         %orig;
         
@@ -159,11 +187,122 @@ General Stuff
     }
 %end
 
+%hook PHHandsetDialerView
+    - (void) setBackgroundColor:(UIColor *)arg1
+    {
+        %orig(PHONE_GREY);
+    }
+%end
+
+//keypad buttons
+%hook PHHandsetDialerNumberPadButton
+    + (double) unhighlightedCircleViewAlpha
+    {
+        return 0.25;
+    }
+    + (double) highlightedCircleViewAlpha
+    {
+        return 1.0;
+    }
+    - (UIColor *) buttonColor
+    {
+        return UIColorMake(200, 200, 200, 1);
+    }
+%end
+
+//fix the delete button
+%hook PHHandsetDialerDeleteButton
+    - (void) setTintColor:(UIColor *)arg1 
+    {
+        %orig([UIColor whiteColor]);
+    }
+%end
+%hook CNContactHeaderDisplayView
+    - (void) setBackgroundColor:(id)arg1
+    {
+        %orig(PHONE_GREY);
+    }
+%end
+
+%hook CNContactListTableView
+    - (void) setBackgroundColor:(id)arg1
+    {
+        %orig(PHONE_GREY);
+    }
+%end
+
+%hook CNActionsView
+    - (void) setBackgroundColor:(UIColor *)arg1
+    {
+        %orig;
+        [[self superview] setBackgroundColor:PHONE_GREY];
+    }
+%end
+
+%hook CNContactListTableViewCell
+    - (void) setBackgroundColor:(id)arg1
+    {
+        for (UIView *v in [self subviews])
+        {
+            [v setBackgroundColor:[UIColor clearColor]];
+        }
+
+        %orig(CELL_GREY);
+    }
+%end
+
+%hook CNContactActionCell
+    - (void) setBackgroundColor:(id)arg1
+    {
+        for (UIView *v in [self subviews])
+        {
+            [v setBackgroundColor:[UIColor clearColor]];
+        }
+
+        %orig(CELL_GREY);
+    }
+%end
+%hook CNPropertyPhoneNumberCell
+    - (void) setBackgroundColor:(id)arg1
+    {
+        for (UIView *v in [self subviews])
+        {
+            [v setBackgroundColor:[UIColor clearColor]];
+        }
+
+        %orig(CELL_GREY);
+    }
+%end
+%hook CNPropertyEmailAddressCell
+    - (void) setBackgroundColor:(id)arg1
+    {
+        for (UIView *v in [self subviews])
+        {
+            [v setBackgroundColor:[UIColor clearColor]];
+        }
+
+        %orig(CELL_GREY);
+    }
+%end
+
+%hook UITableViewLabel
+    - (void) setBackgroundColor:(id)arg1
+    {
+        %orig([UIColor clearColor]);
+    }
+%end
+
+
+%end
 %ctor
 {
+    initPrefs();
+    loadPrefs();
+    
     [[UITextField appearance] setKeyboardAppearance:UIKeyboardAppearanceAlert];
-    if (enabled)
+
+    if (enabled && trueBlackEnabled)
     {
-        %init(_ungrouped);
+        %init(Tweak)
     }
 }

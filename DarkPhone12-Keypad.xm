@@ -1,7 +1,9 @@
 #import <substrate.h>
 #import "DarkPhone12.h"
 
+
 //set the main view to grey
+/*
 %hook PHHandsetDialerView
     - (void) setBackgroundColor:(UIColor *)arg1
     {
@@ -32,3 +34,12 @@
         %orig([UIColor whiteColor]);
     }
 %end
+
+%ctor
+{
+    if (enabled)
+    {
+        %init;
+    }
+}
+*/

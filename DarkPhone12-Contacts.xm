@@ -1,9 +1,9 @@
 #import <substrate.h>
 #import <objc/runtime.h>
-
 #import "DarkPhone12.h"
 
-%hook CNContactHeaderDisplayView
+
+/*%hook CNContactHeaderDisplayView
     - (void) setBackgroundColor:(id)arg1
     {
         %orig(PHONE_GREY);
@@ -32,7 +32,7 @@
         {
             [v setBackgroundColor:[UIColor clearColor]];
         }
-        
+
         %orig(CELL_GREY);
     }
 %end
@@ -76,4 +76,12 @@
     {
         %orig([UIColor clearColor]);
     }
-%end
+%end*/
+
+%ctor
+{
+    if (enabled)
+    {
+        %init;
+    }
+}
