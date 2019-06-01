@@ -18,58 +18,58 @@
 %end
 
 %hook CNActionsView
--(void) setBackgroundColor:(UIColor *)arg1
-{
-    %orig;
-    [[self superview] setBackgroundColor:PHONE_GREY];
-}
+    -(void) setBackgroundColor:(UIColor *)arg1
+    {
+        %orig;
+        [[self superview] setBackgroundColor:PHONE_GREY];
+    }
 %end
 
 %hook CNContactListTableViewCell
--(void) setBackgroundColor:(id)arg1
-{
-    for (UIView *v in [self subviews])
+    -(void) setBackgroundColor:(id)arg1
     {
-        [v setBackgroundColor:[UIColor clearColor]];
+        for (UIView *v in [self subviews])
+        {
+            [v setBackgroundColor:[UIColor clearColor]];
+        }
+        %orig(CELL_GREY);
     }
-    %orig(CELL_GREY);
-}
 %end
 
 %hook CNContactActionCell
--(void) setBackgroundColor:(id)arg1
-{
-    for (UIView *v in [self subviews])
+    -(void) setBackgroundColor:(id)arg1
     {
-        [v setBackgroundColor:[UIColor clearColor]];
+        for (UIView *v in [self subviews])
+        {
+            [v setBackgroundColor:[UIColor clearColor]];
+        }
+        %orig(CELL_GREY);
     }
-    %orig(CELL_GREY);
-}
 %end
 %hook CNPropertyPhoneNumberCell
--(void) setBackgroundColor:(id)arg1
-{
-    for (UIView *v in [self subviews])
+    -(void) setBackgroundColor:(id)arg1
     {
-        [v setBackgroundColor:[UIColor clearColor]];
+        for (UIView *v in [self subviews])
+        {
+            [v setBackgroundColor:[UIColor clearColor]];
+        }
+        %orig(CELL_GREY);
     }
-    %orig(CELL_GREY);
-}
 %end
 %hook CNPropertyEmailAddressCell
--(void) setBackgroundColor:(id)arg1
-{
-    for (UIView *v in [self subviews])
+    -(void) setBackgroundColor:(id)arg1
     {
-        [v setBackgroundColor:[UIColor clearColor]];
+        for (UIView *v in [self subviews])
+        {
+            [v setBackgroundColor:[UIColor clearColor]];
+        }
+        %orig(CELL_GREY);
     }
-    %orig(CELL_GREY);
-}
 %end
 
 %hook UITableViewLabel
--(void) setBackgroundColor:(id)arg1
-{
-   %orig([UIColor clearColor]);
-}
+    -(void) setBackgroundColor:(id)arg1
+    {
+    %orig([UIColor clearColor]);
+    }
 %end
