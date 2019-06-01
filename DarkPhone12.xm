@@ -1,6 +1,16 @@
+/*
+DarkPhone12
+
+
+Copyright (C) shepgoba 2019
+*/
+
+
+
 #import <substrate.h>
 #import "DarkPhone12.h"
 
+//https://stackoverflow.com/questions/970475/how-to-compare-uicolors, by samvermette
 BOOL colorIsEqualToColorWithTolerance(UIColor *color1, UIColor *color2, CGFloat tolerance)
 {
     CGFloat r1, g1, b1, a1, r2, g2, b2, a2;
@@ -45,7 +55,7 @@ General Stuff
 - (void) setTextColor:(UIColor *)arg1
 {
     %orig;
-    if ([self.textColor isEqual:[UIColor blackColor]])
+    if (colorIsEqualToColorWithTolerance(self.textColor, [UIColor blackColor], 0.25))
     {
         %orig([UIColor whiteColor]);
     }
@@ -58,7 +68,7 @@ General Stuff
 {
     %orig;
     
-    if (colorIsEqualToColorWithTolerance(self.backgroundColor, [UIColor whiteColor], 0.06)) 
+    if (colorIsEqualToColorWithTolerance(self.backgroundColor, [UIColor whiteColor], 0.06) && ![self isKindOfClass:[UIControl class]]) 
     {
         %orig(PHONE_GREY);
     }
@@ -87,6 +97,12 @@ General Stuff
     {
         return UIStatusBarStyleLightContent;
     }
+%end
+
+%hook UINavigationController
+-(UIStatusBarStyle)preferredStatusBarStyle {
+    return UIStatusBarStyleLightContent; // your own style
+}
 %end
 
 // Top bar grey
