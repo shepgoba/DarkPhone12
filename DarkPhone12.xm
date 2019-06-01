@@ -10,6 +10,8 @@ Copyright (C) shepgoba 2019
 #import <substrate.h>
 #import "DarkPhone12.h"
 
+BOOL enabled = NO;
+
 //https://stackoverflow.com/questions/970475/how-to-compare-uicolors, by samvermette
 BOOL colorIsEqualToColorWithTolerance(UIColor *color1, UIColor *color2, CGFloat tolerance)
 {
@@ -29,6 +31,7 @@ BOOL colorIsEqualToColorWithTolerance(UIColor *color1, UIColor *color2, CGFloat 
 General Stuff
 
 */
+%group Main
 %hook UICollectionView
 
     /* Makes tableviews look a lot cleaner */
@@ -87,8 +90,14 @@ General Stuff
 }
 %end
 
-// Make text in fields white
+// Make text in fields white (both are needed for a few select fields)
 %hook UITextField
+-(id)initWithFrame:(CGRect)arg1
+{
+    UITextField *orig = %orig;
+    orig.textColor = [UIColor whiteColor];
+    return orig;
+}
 -(void)setTextColor:(UIColor *)arg1 
 {
     %orig([UIColor whiteColor]);
@@ -96,6 +105,13 @@ General Stuff
 %end
 
 %hook UITextView
+-(id)initWithFrame:(CGRect)arg1
+{
+    UITextView *orig = %orig;
+    orig.textColor = [UIColor whiteColor];
+    return orig;
+}
+
 -(void)setTextColor:(UIColor *)arg1 
 {
     %orig([UIColor whiteColor]);
@@ -112,9 +128,10 @@ General Stuff
 %end
 
 %hook UINavigationController
--(UIStatusBarStyle)preferredStatusBarStyle {
-    return UIStatusBarStyleLightContent; // your own style
-}
+    -(UIStatusBarStyle)preferredStatusBarStyle 
+    {
+        return UIStatusBarStyleLightContent; 
+    }
 %end
 
 // Top bar grey
@@ -133,21 +150,25 @@ General Stuff
     }
 %end
 
-%hook _UINavigationBarLargeTitleView
-
-/* Top Labels (these have to be updated constantly for some reason, it doesn't work if it's set once) */
--(void)updateContent
+// Get white titles
+%hook UINavigationBar
+-(id)initWithFrame:(CGRect)arg1
 {
-    %orig;
-    for (UILabel *l in [self subviews])
-    {
-        [l setTextColor:[UIColor whiteColor]];
-    }
+    UINavigationBar *orig = %orig;
+    [orig setBarStyle: 1]; //1 for white text
+    return orig;
 }
+%end
+
 %end
 
 %ctor
 {
     [[UITextField appearance] setKeyboardAppearance:UIKeyboardAppearanceAlert];
-    %init;
+    if (enabled)
+    {
+        %init(Main);
+        //%init(Keypad);
+        //%init(Contacts);
+    }
 }
