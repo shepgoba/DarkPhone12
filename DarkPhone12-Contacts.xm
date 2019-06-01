@@ -3,7 +3,6 @@
 
 #import "DarkPhone12.h"
 
-%group Contacts
 %hook CNContactHeaderDisplayView
     -(void) setBackgroundColor:(id)arg1
     {
@@ -73,5 +72,4 @@
 {
    %orig([UIColor clearColor]);
 }
-%end
 %end

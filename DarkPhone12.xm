@@ -10,6 +10,7 @@ Copyright (C) shepgoba 2019
 #import <substrate.h>
 #import "DarkPhone12.h"
 
+//TODO: add prefs
 BOOL enabled = NO;
 
 //https://stackoverflow.com/questions/970475/how-to-compare-uicolors, by samvermette
@@ -31,7 +32,6 @@ BOOL colorIsEqualToColorWithTolerance(UIColor *color1, UIColor *color2, CGFloat 
 General Stuff
 
 */
-%group Main
 %hook UICollectionView
 
     /* Makes tableviews look a lot cleaner */
@@ -160,15 +160,11 @@ General Stuff
 }
 %end
 
-%end
-
 %ctor
 {
     [[UITextField appearance] setKeyboardAppearance:UIKeyboardAppearanceAlert];
     if (enabled)
     {
-        %init(Main);
-        //%init(Keypad);
-        //%init(Contacts);
+        %init(_ungrouped);
     }
 }

@@ -1,7 +1,6 @@
 #import <substrate.h>
 #import "DarkPhone12.h"
 
-%group Keypad
 //set the main view to grey
 %hook PHHandsetDialerView
     - (void) setBackgroundColor:(UIColor *)arg1
@@ -32,6 +31,4 @@
     {
         %orig([UIColor whiteColor]);
     }
-%end
-
 %end
