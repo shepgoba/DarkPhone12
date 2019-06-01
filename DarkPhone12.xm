@@ -29,6 +29,18 @@ BOOL colorIsEqualToColorWithTolerance(UIColor *color1, UIColor *color2, CGFloat 
 General Stuff
 
 */
+%hook UICollectionView
+
+    /* Makes tableviews look a lot cleaner */
+    -(void)setSeparatorStyle:(long long)arg1 
+    {
+        %orig(0);
+    }
+    -(void) setBackgroundColor:(id)arg1
+    {
+        %orig(PHONE_GREY);
+    }
+%end
 
 %hook UITableView
 

@@ -64,3 +64,10 @@
     %orig(CELL_GREY);
 }
 %end
+
+%hook UITableViewLabel
+-(void) setBackgroundColor:(id)arg1
+{
+   %orig([UIColor clearColor]);
+}
+%end
