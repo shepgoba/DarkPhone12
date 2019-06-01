@@ -35,11 +35,11 @@ General Stuff
 %hook UICollectionView
 
     /* Makes tableviews look a lot cleaner */
-    -(void)setSeparatorStyle:(long long)arg1 
+    - (void) setSeparatorStyle:(long long)arg1 
     {
         %orig(0);
     }
-    -(void) setBackgroundColor:(id)arg1
+    - (void) setBackgroundColor:(id)arg1
     {
         %orig(PHONE_GREY);
     }
@@ -48,87 +48,86 @@ General Stuff
 %hook UITableView
 
     /* Makes tableviews look a lot cleaner */
-    -(void)setSeparatorStyle:(long long)arg1 
+    - (void) setSeparatorStyle:(long long)arg1 
     {
         %orig(0);
     }
-    -(void) setBackgroundColor:(id)arg1
+    - (void) setBackgroundColor:(id)arg1
     {
         %orig(PHONE_GREY);
     }
 %end
 
 %hook UITableViewCell
-- (void) setBackgroundColor:(UIColor *)arg1
-{
-    %orig(CELL_GREY);
-}
+    - (void) setBackgroundColor:(UIColor *)arg1
+    {
+        %orig(CELL_GREY);
+    }
 %end
 
 // Get all black text elements and make them white
 %hook UILabel
-- (void) setTextColor:(UIColor *)arg1
-{
-    %orig;
-    if (colorIsEqualToColorWithTolerance(self.textColor, [UIColor blackColor], 0.25))
+    - (void) setTextColor:(UIColor *)arg1
     {
-        %orig([UIColor whiteColor]);
+        %orig;
+        if (colorIsEqualToColorWithTolerance(self.textColor, [UIColor blackColor], 0.25))
+        {
+            %orig([UIColor whiteColor]);
+        }
     }
-}
 %end
 
 // Get all white elements and make them grey
 %hook UIView
-- (void) setBackgroundColor:(UIColor *)_
-{
-    %orig;
-    
-    if (colorIsEqualToColorWithTolerance(self.backgroundColor, [UIColor whiteColor], 0.06) && ![self isKindOfClass:[UIControl class]]) 
+    - (void) setBackgroundColor:(UIColor *)_
     {
-        %orig(PHONE_GREY);
+        %orig;
+        
+        if (colorIsEqualToColorWithTolerance(self.backgroundColor, [UIColor whiteColor], 0.06) && ![self isKindOfClass:[UIControl class]]) 
+        {
+            %orig(PHONE_GREY);
+        }
     }
-}
 %end
 
 // Make text in fields white (both are needed for a few select fields)
 %hook UITextField
--(id)initWithFrame:(CGRect)arg1
-{
-    UITextField *orig = %orig;
-    orig.textColor = [UIColor whiteColor];
-    return orig;
-}
--(void)setTextColor:(UIColor *)arg1 
-{
-    %orig([UIColor whiteColor]);
-}
+    - (id) initWithFrame:(CGRect)arg1
+    {
+        UITextField *orig = %orig;
+        orig.textColor = [UIColor whiteColor];
+        return orig;
+    }
+    - (void) setTextColor:(UIColor *)arg1 
+    {
+        %orig([UIColor whiteColor]);
+    }
 %end
 
 %hook UITextView
--(id)initWithFrame:(CGRect)arg1
-{
-    UITextView *orig = %orig;
-    orig.textColor = [UIColor whiteColor];
-    return orig;
-}
-
--(void)setTextColor:(UIColor *)arg1 
-{
-    %orig([UIColor whiteColor]);
-}
+    - (id) initWithFrame:(CGRect)arg1
+    {
+        UITextView *orig = %orig;
+        orig.textColor = [UIColor whiteColor];
+        return orig;
+    }
+    - (void) setTextColor:(UIColor *)arg1 
+    {
+        %orig([UIColor whiteColor]);
+    }
 %end
 
 
 // Get light status bar
 %hook UIViewController
-    -(UIStatusBarStyle) preferredStatusBarStyle
+    - (UIStatusBarStyle) preferredStatusBarStyle
     {
         return UIStatusBarStyleLightContent;
     }
 %end
 
 %hook UINavigationController
-    -(UIStatusBarStyle)preferredStatusBarStyle 
+    - (UIStatusBarStyle) preferredStatusBarStyle 
     {
         return UIStatusBarStyleLightContent; 
     }
@@ -152,12 +151,12 @@ General Stuff
 
 // Get white titles
 %hook UINavigationBar
--(id)initWithFrame:(CGRect)arg1
-{
-    UINavigationBar *orig = %orig;
-    [orig setBarStyle: 1]; //1 for white text
-    return orig;
-}
+    - (id) initWithFrame:(CGRect)arg1
+    {
+        UINavigationBar *orig = %orig;
+        [orig setBarStyle: 1]; //1 for white text
+        return orig;
+    }
 %end
 
 %ctor

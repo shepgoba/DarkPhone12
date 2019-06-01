@@ -11,15 +11,15 @@
 
 //keypad buttons
 %hook PHHandsetDialerNumberPadButton
-    +(double)unhighlightedCircleViewAlpha
+    + (double) unhighlightedCircleViewAlpha
     {
         return 0.25;
     }
-    +(double)highlightedCircleViewAlpha
+    + (double) highlightedCircleViewAlpha
     {
         return 1.0;
     }
-    -(UIColor *)buttonColor
+    - (UIColor *) buttonColor
     {
         return UIColorMake(200, 200, 200, 1);
     }
@@ -27,7 +27,7 @@
 
 //fix the delete button
 %hook PHHandsetDialerDeleteButton
-    -(void)setTintColor:(UIColor *)arg1 
+    - (void) setTintColor:(UIColor *)arg1 
     {
         %orig([UIColor whiteColor]);
     }
