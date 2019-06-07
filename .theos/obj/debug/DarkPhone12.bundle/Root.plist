@@ -21,6 +21,8 @@
 			<string>enabled</string>
 			<key>label</key>
 			<string>Enabled</string>
+            <key>PostNotification</key>
+            <string>com.shepgoba.darkphone12/prefsUpdated</string>
 		</dict>
         <dict>
 			<key>cell</key>
@@ -33,6 +35,8 @@
 			<string>trueBlackEnabled</string>
 			<key>label</key>
 			<string>True Black Mode</string>
+            <key>PostNotification</key>
+            <string>com.shepgoba.darkphone12/prefsUpdated</string>
 		</dict>
 	</array>
 	<key>title</key>

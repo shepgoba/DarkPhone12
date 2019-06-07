@@ -10,13 +10,15 @@ Copyright (C) shepgoba 2019
 
 BOOL enabled, trueBlackEnabled;
 
-UIColor* PHONE_GREY = UIColorMake(25, 25, 25, 1);
-UIColor* CELL_GREY = UIColorMake(35, 35, 35, 1);
+UIColor *PHONE_GREY;
+UIColor *CELL_GREY;
 
-static void initPrefs() {
+static void initPrefs() 
+{
 	NSFileManager *fileManager = [NSFileManager defaultManager];
 
-	if (![fileManager fileExistsAtPath:PREFS_PATH]) {
+	if (![fileManager fileExistsAtPath:PREFS_PATH]) 
+    {
 		[fileManager copyItemAtPath:PREFS_DEFAULT_PATH toPath:PREFS_PATH error:nil];
 	}
 }
@@ -24,17 +26,24 @@ static void initPrefs() {
 static void loadPrefs()
 {
     NSDictionary *prefs = [NSMutableDictionary dictionaryWithContentsOfFile:PREFS_PATH];
-
+    
     if (prefs)
     {
         enabled = [prefs objectForKey:@"enabled"] ? [[prefs objectForKey:@"enabled"] boolValue] : YES;
         trueBlackEnabled = [prefs objectForKey:@"trueBlackEnabled"] ? [[prefs objectForKey:@"trueBlackEnabled"] boolValue] : YES;
     }
+
     if (trueBlackEnabled)
     {
         PHONE_GREY = UIColorMake(0, 0, 0, 1);
-        CELL_GREY = [UIColor clearColor];
+        CELL_GREY = UIColorMake(20, 20, 20, 1);
+    } 
+    else 
+    {
+        PHONE_GREY = UIColorMake(25, 25, 25, 1);
+        CELL_GREY = UIColorMake(35, 35, 35, 1);
     }
+
 }
 
 
@@ -206,7 +215,7 @@ General Stuff
     }
     - (UIColor *) buttonColor
     {
-        return UIColorMake(200, 200, 200, 1);
+        return UIColorMake(80, 80, 80, 1);
     }
 %end
 
@@ -215,6 +224,13 @@ General Stuff
     - (void) setTintColor:(UIColor *)arg1 
     {
         %orig([UIColor whiteColor]);
+    }
+%end
+
+%hook PHBottomBarButton
+    - (void) setBackgroundColor:(UIColor *)_
+    {
+        %orig([UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0]);
     }
 %end
 %hook CNContactHeaderDisplayView
@@ -262,6 +278,7 @@ General Stuff
         %orig(CELL_GREY);
     }
 %end
+
 %hook CNPropertyPhoneNumberCell
     - (void) setBackgroundColor:(id)arg1
     {
@@ -273,6 +290,7 @@ General Stuff
         %orig(CELL_GREY);
     }
 %end
+
 %hook CNPropertyEmailAddressCell
     - (void) setBackgroundColor:(id)arg1
     {
@@ -292,17 +310,26 @@ General Stuff
     }
 %end
 
-
 %end
+
 %ctor
 {
-    initPrefs();
-    loadPrefs();
-    
-    [[UITextField appearance] setKeyboardAppearance:UIKeyboardAppearanceAlert];
+    @autoreleasepool
+        {
+        CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), 
+            NULL, 
+            (CFNotificationCallback)loadPrefs, 
+            CFSTR("com.shepgoba.darkphone12/prefsUpdated"),
+            NULL, 
+            CFNotificationSuspensionBehaviorCoalesce);
 
-    if (enabled && trueBlackEnabled)
-    {
-        %init(Tweak)
+        initPrefs();
+        loadPrefs();
+        
+        if (enabled)
+        {
+            [[UITextField appearance] setKeyboardAppearance:UIKeyboardAppearanceAlert];
+            %init(Tweak)
+        }
     }
 }
