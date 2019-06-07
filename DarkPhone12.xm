@@ -6,6 +6,7 @@ Copyright (C) shepgoba 2019
 */
 
 #import <substrate.h>
+#import <objc/runtime.h>
 #import "DarkPhone12.h"
 
 BOOL enabled, trueBlackEnabled;
@@ -40,8 +41,8 @@ static void loadPrefs()
     } 
     else 
     {
-        PHONE_GREY = UIColorMake(25, 25, 25, 1);
-        CELL_GREY = UIColorMake(35, 35, 35, 1);
+        PHONE_GREY = UIColorMake(20, 20, 20, 1);
+        CELL_GREY = UIColorMake(40, 40, 40, 1);
     }
 
 }
@@ -85,20 +86,19 @@ General Stuff
 %hook UITableView
 
     /* Makes tableviews look a lot cleaner */
-    - (void) setSeparatorStyle:(long long)arg1 
+    /*- (void) setSeparatorStyle:(long long)arg1 
     {
         %orig(0);
-    }
+    }*/
     - (void) setBackgroundColor:(id)arg1
     {
         %orig(PHONE_GREY);
     }
 %end
-
 %hook UITableViewCell
     - (void) setBackgroundColor:(UIColor *)arg1
     {
-        %orig(CELL_GREY);
+        %orig([UIColor clearColor]);
     }
 %end
 
@@ -119,8 +119,8 @@ General Stuff
     - (void) setBackgroundColor:(UIColor *)arg1
     {
         %orig;
-        
-        if (colorIsEqualToColorWithTolerance(self.backgroundColor, [UIColor whiteColor], 0.06) && ![self isKindOfClass:[UIControl class]]) 
+
+        if (colorIsEqualToColorWithTolerance(self.backgroundColor, [UIColor whiteColor], 0.06)) 
         {
             %orig(PHONE_GREY);
         }
@@ -195,7 +195,17 @@ General Stuff
         return orig;
     }
 %end
+%hook UIAlertController
+    - (void) layoutSubviews
+    {
+        %orig;
+        UIView *subView = self.view.subviews.firstObject; //firstObject
+        UIView *alertContentView = subView.subviews.firstObject; //firstObject
 
+        [alertContentView setBackgroundColor:[UIColor darkGrayColor]];
+        //alertContentView.layer.cornerRadius = 5;
+    }
+%end
 %hook PHHandsetDialerView
     - (void) setBackgroundColor:(UIColor *)arg1
     {
@@ -215,10 +225,24 @@ General Stuff
     }
     - (UIColor *) buttonColor
     {
-        return UIColorMake(80, 80, 80, 1);
+        return UIColorMake(200, 200, 200, 1);
     }
 %end
-
+%hook TPNumberPadButton
+    +(id)imageForCharacter:(unsigned)arg1 highlighted:(BOOL)arg2 whiteVersion:(BOOL)arg3
+    {
+        arg3 = NO;
+        return %orig;
+    }
+    +(id)imageForCharacter:(unsigned)arg1
+    {
+        return %orig;
+    }
+    +(id)imageForCharacter:(unsigned)arg1 highlighted:(BOOL)arg2
+    {
+        return %orig;
+    }
+%end
 //fix the delete button
 %hook PHHandsetDialerDeleteButton
     - (void) setTintColor:(UIColor *)arg1 
@@ -227,12 +251,14 @@ General Stuff
     }
 %end
 
-%hook PHBottomBarButton
+//change call button color
+/*%hook PHBottomBarButton
     - (void) setBackgroundColor:(UIColor *)_
     {
         %orig([UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0]);
     }
-%end
+%end*/
+
 %hook CNContactHeaderDisplayView
     - (void) setBackgroundColor:(id)arg1
     {
@@ -303,6 +329,19 @@ General Stuff
     }
 %end
 
+%hook CNContactListHeaderFooterView
+    - (id) initWithReuseIdentifier:(id)arg1
+    {
+        CNContactListHeaderFooterView *orig = %orig;
+        for (UIView *v in [orig subviews])
+        {
+            [v setBackgroundColor:CELL_GREY];
+        }
+        return orig;
+    }
+
+%end
+
 %hook UITableViewLabel
     - (void) setBackgroundColor:(id)arg1
     {
@@ -312,13 +351,14 @@ General Stuff
 
 %end
 
+static void settingsUpdated(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo){
+    loadPrefs();
+}
 %ctor
 {
-    @autoreleasepool
-        {
         CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), 
             NULL, 
-            (CFNotificationCallback)loadPrefs, 
+            settingsUpdated, 
             CFSTR("com.shepgoba.darkphone12/prefsUpdated"),
             NULL, 
             CFNotificationSuspensionBehaviorCoalesce);
@@ -331,5 +371,4 @@ General Stuff
             [[UITextField appearance] setKeyboardAppearance:UIKeyboardAppearanceAlert];
             %init(Tweak)
         }
-    }
 }
