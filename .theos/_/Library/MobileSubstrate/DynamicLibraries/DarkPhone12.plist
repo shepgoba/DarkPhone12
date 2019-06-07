@@ -1,2 +1,0 @@
-{ Filter = { Bundles = ( "com.apple.mobilephone", "xyz.willy.Zebra" ); }; }
-
