@@ -12,3 +12,9 @@
 
 @interface PHHandsetDialerNumberPadButton : UIView
 @end
+
+@interface CNUINavigationListViewCell : UITableViewCell
+@end
+
+@interface _UIVisualEffectSubview : UIView
+@end

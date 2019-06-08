@@ -1,5 +1,5 @@
 #import <Preferences/PSListController.h>
 
-@interface DPPRootListController : PSListController
+@interface DarkPhone12Prefs : PSListController
 
 @end

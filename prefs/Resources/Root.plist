@@ -38,6 +38,18 @@
             <key>PostNotification</key>
             <string>com.shepgoba.darkphone12/prefsUpdated</string>
 		</dict>
+        <dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+		</dict>
+        <dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>@shepgoba</string>
+			<key>action</key>
+			<string>openTwitter</string>
+		</dict>
 	</array>
 	<key>title</key>
 	<string>DarkPhone12</string>

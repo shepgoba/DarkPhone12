@@ -6,6 +6,7 @@ Copyright (C) shepgoba 2019
 */
 
 #import <substrate.h>
+#import <objc/runtime.h>
 #import "DarkPhone12.h"
 
 BOOL enabled, trueBlackEnabled;
@@ -70,12 +71,6 @@ General Stuff
 %group Tweak
 
 %hook UICollectionView
-
-    /* Makes tableviews look a lot cleaner */
-    - (void) setSeparatorStyle:(long long)arg1 
-    {
-        %orig(0);
-    }
     - (void) setBackgroundColor:(id)arg1
     {
         %orig(PHONE_GREY);
@@ -83,21 +78,16 @@ General Stuff
 %end
 
 %hook UITableView
-
-    /* Makes tableviews look a lot cleaner */
-    /*- (void) setSeparatorStyle:(long long)arg1 
-    {
-        %orig(0);
-    }*/
     - (void) setBackgroundColor:(id)arg1
     {
         %orig(PHONE_GREY);
     }
 %end
 %hook UITableViewCell
-    - (void) setBackgroundColor:(UIColor *)arg1
+    - (void) setBackgroundColor:(id)arg1
     {
-        %orig([UIColor clearColor]);
+        if (colorIsEqualToColorWithTolerance(self.backgroundColor, [UIColor whiteColor], 0.2))
+            %orig([UIColor clearColor]);
     }
 %end
 
@@ -173,11 +163,13 @@ General Stuff
 %hook _UIVisualEffectSubview
     - (void) setBackgroundColor:(id)arg1
     {
-        %orig(PHONE_GREY);
+        //%orig;
+        //if (colorIsEqualToColorWithTolerance(self.backgroundColor, [UIColor whiteColor], 0.2))
+           %orig(PHONE_GREY);
     }
 %end
 
-// Bottom bar grey
+// Top bar white text
 %hook _UINavigationBarContentView
     - (void) setTextColor:(UIColor *)arg1 
     {
@@ -194,17 +186,13 @@ General Stuff
         return orig;
     }
 %end
-%hook UIAlertController
-    - (void) layoutSubviews
-    {
-        %orig;
-        UIView *subView = self.view.subviews.firstObject; //firstObject
-        UIView *alertContentView = subView.subviews.firstObject; //firstObject
 
-        [alertContentView setBackgroundColor:[UIColor darkGrayColor]];
-        //alertContentView.layer.cornerRadius = 5;
-    }
-%end
+
+/* 
+
+Keypad Tab
+
+*/
 %hook PHHandsetDialerView
     - (void) setBackgroundColor:(UIColor *)arg1
     {
@@ -248,9 +236,6 @@ General Stuff
     }
 %end
 
-%hook TPNumberPadButton
-%end
-
 //fix the delete button
 %hook PHHandsetDialerDeleteButton
     - (void) setTintColor:(UIColor *)arg1 
@@ -259,14 +244,12 @@ General Stuff
     }
 %end
 
-//change call button color
-/*%hook PHBottomBarButton
-    - (void) setBackgroundColor:(UIColor *)_
-    {
-        %orig([UIColor colorWithRed:0.0 green:122.0/255.0 blue:1.0 alpha:1.0]);
-    }
-%end*/
 
+/*
+
+Contacts Tab
+
+*/
 %hook CNContactHeaderDisplayView
     - (void) setBackgroundColor:(id)arg1
     {
@@ -349,13 +332,23 @@ General Stuff
     }
 
 %end
-
+%hook CNUINavigationListViewCell
+    - (void) setBackgroundColor:(UIColor *)arg1
+    {
+        %orig;
+        for (UITableViewCellContentView *v in [self subviews])
+        {
+            [v setBackgroundColor:CELL_GREY];
+        }
+    }
+%end
 %hook UITableViewLabel
     - (void) setBackgroundColor:(id)arg1
     {
         %orig([UIColor clearColor]);
     }
 %end
+
 
 %end
 
