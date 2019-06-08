@@ -6,6 +6,7 @@ Copyright (C) shepgoba 2019
 */
 
 #import <substrate.h>
+#import <objc/runtime.h>
 #import "DarkPhone12.h"
 
 BOOL enabled, trueBlackEnabled;
@@ -214,26 +215,20 @@ General Stuff
 
 //keypad buttons
 %hook PHHandsetDialerNumberPadButton
-    /* Get white assets for keypad (These have to be loaded manually otherwise they stay in the Phone App's cache) */
     +(id)imageForCharacter:(unsigned)arg1 highlighted:(BOOL)arg2 whiteVersion:(BOOL)arg3
     {
-
-        if (enabled)
-        {
-            NSString *imagesPath = @"/Library/PreferenceBundles/DarkPhone12.bundle/keypad_images";
-            NSString *imageFile = [NSString stringWithFormat:@"%@/number%i.png", imagesPath, arg1];
-            UIImage *imgForCharacter = [UIImage imageWithContentsOfFile:imageFile];
-            if (imgForCharacter)
-            {
-                UIImage *scaledImage = [UIImage imageWithCGImage:[imgForCharacter CGImage] scale:(imgForCharacter.scale * 2) orientation:(imgForCharacter.imageOrientation)];
-                return scaledImage;
-            } else 
-            {
-                NSLog(@"image could not be loaded");
-            }
-        }
+        arg3 = NO;
+        return NULL;
+    }
+    /*+(id)imageForCharacter:(unsigned)arg1
+    {
         return %orig;
     }
+    +(id)imageForCharacter:(unsigned)arg1 highlighted:(BOOL)arg2
+    {
+        return %orig;
+    }*/
+
     + (double) unhighlightedCircleViewAlpha
     {
         return 0.25;
@@ -362,7 +357,6 @@ General Stuff
 static void settingsUpdated(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo){
     loadPrefs();
 }
-
 %ctor
 {
     CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), 
@@ -377,9 +371,7 @@ static void settingsUpdated(CFNotificationCenterRef center, void *observer, CFSt
         
     if (enabled)
     {
-        /* Make the keyboard black */
         [[UITextField appearance] setKeyboardAppearance:UIKeyboardAppearanceAlert];
-
-        %init(Tweak);
+        %init(Tweak)
     }
 }

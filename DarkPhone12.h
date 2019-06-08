@@ -9,3 +9,6 @@
 
 @interface HKMedicalIDEditorMultilineStringCell : UIView
 @end
+
+@interface PHHandsetDialerNumberPadButton : UIView
+@end
