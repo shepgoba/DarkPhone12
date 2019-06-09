@@ -82,6 +82,7 @@ General Stuff
 
 %group Tweak
 
+// Set the tint color theme
 %hook UILayoutContainerView
     - (id) initWithFrame:(CGRect)arg1
     {
@@ -90,6 +91,7 @@ General Stuff
         return orig;
     }
 %end
+
 %hook UICollectionView
     - (void) setBackgroundColor:(id)arg1
     {
@@ -375,6 +377,22 @@ Contacts Tab
     }
 %end
 
+%hook TKVibrationRecorderTouchSurface
+    - (id) initWithFrame:(CGRect)_
+    {
+        TKVibrationRecorderTouchSurface *orig = %orig;
+        for (UILabel *l in [orig subviews])
+        {
+            if ([l isKindOfClass:[UILabel class]])
+            {
+                l.opaque = NO;
+                l.textColor = [UIColor blackColor];
+            }
+        }
+        [orig setBackgroundColor:PHONE_GREY];
+        return orig;
+    }
+%end
 
 %end
 
