@@ -9,6 +9,7 @@ DarkPhone12_FILES = DarkPhone12Prefs.m
 DarkPhone12_INSTALL_PATH = /Library/PreferenceBundles
 DarkPhone12_FRAMEWORKS = UIKit
 DarkPhone12_PRIVATE_FRAMEWORKS = Preferences
+DarkPhone12_LIBRARIES = colorpicker
 SHARED_CFLAGS = -fobjc-arc
 
 include $(THEOS_MAKE_PATH)/bundle.mk

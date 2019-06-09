@@ -6,13 +6,15 @@ Copyright (C) shepgoba 2019
 */
 
 #import <substrate.h>
-#import <objc/runtime.h>
+#import <libcolorpicker.h>
 #import "DarkPhone12.h"
 
 BOOL enabled, trueBlackEnabled;
 
 UIColor *PHONE_GREY;
 UIColor *CELL_GREY;
+
+UIColor *TINT_COLOR;
 
 static void initPrefs() 
 {
@@ -45,6 +47,16 @@ static void loadPrefs()
         CELL_GREY = UIColorMake(40, 40, 40, 1);
     }
 
+    NSDictionary *colorPrefs = [NSMutableDictionary dictionaryWithContentsOfFile:COLOR_PREFS_PATH];
+    if (colorPrefs)
+    {
+        TINT_COLOR = LCPParseColorString([colorPrefs objectForKey:@"tintColor"], @"#007AFF");
+    }
+    else 
+    {
+        TINT_COLOR = APPLE_DEFAULT_BLUE;
+    }
+
 }
 
 
@@ -70,6 +82,14 @@ General Stuff
 
 %group Tweak
 
+%hook UILayoutContainerView
+    - (id) initWithFrame:(CGRect)arg1
+    {
+        UILayoutContainerView *orig = %orig;
+        [orig setTintColor:TINT_COLOR];
+        return orig;
+    }
+%end
 %hook UICollectionView
     - (void) setBackgroundColor:(id)arg1
     {
@@ -244,6 +264,12 @@ Keypad Tab
     }
 %end
 
+%hook PHBottomBarButton
+    - (void) setBackgroundColor:(UIColor *)arg1
+    {
+        %orig(TINT_COLOR);
+    }
+%end
 
 /*
 
