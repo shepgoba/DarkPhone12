@@ -118,7 +118,7 @@ General Stuff
 %end
 
 %hook UITableView
-    - (void) setSeparatorStyle:(int)_
+    - (void) setSeparatorStyle:(long long)_
     {
         %orig;
         if (hideTableSeparatorsEnabled)
