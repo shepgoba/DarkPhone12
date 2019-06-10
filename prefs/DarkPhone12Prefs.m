@@ -35,4 +35,10 @@
 	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://twitter.com/shepgoba"]];
 }
 
+- (void) openPayPal
+{
+	[[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://paypal.me/shepgobadev"]];
+}
+
+
 @end

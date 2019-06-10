@@ -93,8 +93,6 @@ General Stuff
         {
             [[UIView appearance] setTintColor:TINT_COLOR];
         }
-        /* Set headers to grey */
-        [[UITableViewHeaderFooterView appearance] setTintColor:CELL_GREY];
 
         /* Top bar */
         [[UINavigationBar appearance] setBarTintColor:PHONE_GREY];
@@ -123,7 +121,7 @@ General Stuff
 %end
 
 %hook UITableView
-    - (void) setSeparatorStyle:(unsigned)a
+    - (void) setSeparatorStyle:(int)a
     {
         %orig;
         if (hideTableSeparatorsEnabled)
@@ -133,19 +131,19 @@ General Stuff
     }
     - (void) setBackgroundColor:(id)arg1
     {
-        // /[self setSeparatorColor:TINT_COLOR];
         %orig(PHONE_GREY);
     }
-    /*- (void) setSeparatorColor:(id)arg1
-    {
-        %orig(CELL_GREY);
-    }*/
 %end
 %hook UITableViewCell
     - (void) setBackgroundColor:(id)arg1
-    {
+    {  
         if (colorIsEqualToColorWithTolerance(self.backgroundColor, [UIColor whiteColor], 0.2))
             %orig([UIColor clearColor]);
+
+        if ([[self superview] isKindOfClass:objc_getClass("CNContactListTableView")])
+        {
+            %orig(CELL_GREY);
+        }
     }
 %end
 
@@ -313,28 +311,6 @@ Contacts Tab
     }
 %end
 
-/*%hook CNContactListTableView
-   - (void) setBackgroundColor:(id)arg1
-    {
-        %orig(PHONE_GREY);
-    }
-    - (id) initWithCoder:(id)arg1
-    {
-        CNContactListTableView *orig = %orig;
-         for (UITableViewHeaderFooterView *x in [orig subviews])
-        {
-            if ([x isKindOfClass:[UITableViewHeaderFooterView class]])
-            {
-                UIView * view = [[UIView alloc] initWithFrame:x.bounds];
-                view.backgroundColor = CELL_GREY;
-                x.backgroundView = view;
-                NSLog(@"69420$ operation completed");
-            }
-        }
-        return orig;
-    }
-%end*/
-
 %hook CNActionsView
     - (void) setBackgroundColor:(UIColor *)arg1
     {
@@ -429,14 +405,6 @@ static void settingsUpdated(CFNotificationCenterRef center, void *observer, CFSt
         
     if (enabled)
     {
-        /* Make the keyboard black */
-        //[[UITextField appearance] setKeyboardAppearance:UIKeyboardAppearanceAlert];
-
-        /* Set tint color theme */
-        //[[UIView appearance] setTintColor:TINT_COLOR];
-
-        /* Set headers to grey */
-        //[[UITableViewHeaderFooterView appearance] setTintColor:CELL_GREY];
         %init(Tweak);
     }
 }

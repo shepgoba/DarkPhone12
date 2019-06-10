@@ -113,6 +113,15 @@
 			<key>action</key>
 			<string>openTwitter</string>
 		</dict>
+
+        <dict>
+			<key>cell</key>
+			<string>PSButtonCell</string>
+			<key>label</key>
+			<string>Donate (PayPal)</string>
+			<key>action</key>
+			<string>openPayPal</string>
+		</dict>
 	</array>
 	<key>title</key>
 	<string>DarkPhone12</string>

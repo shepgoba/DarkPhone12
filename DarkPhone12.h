@@ -30,3 +30,7 @@
 @end
 @interface TKVibrationRecorderContentViewController : UIViewController
 @end
+@interface CNContactListTableView : UITableView
+@end
+@interface CNContactListHeaderFooterView : UITableViewCell
+@end
