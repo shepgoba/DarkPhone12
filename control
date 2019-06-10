@@ -6,4 +6,5 @@ Architecture: iphoneos-arm
 Description: Full dark mode for the phone app!
 Maintainer: shepgoba <shepgoba@gmail.com>
 Author: shepgoba <shepgoba@gmail.com>
+Icon: file:///Library/PreferenceBundles/DarkPhone12.bundle/icon@2x.png
 Section: Tweaks

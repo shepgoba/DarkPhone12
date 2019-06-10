@@ -103,7 +103,7 @@ General Stuff
 %end
 
 %hook UITabBar
-    - (id) initWithFrame:(CGRect)arg1
+    - (id) initWithFrame:(CGRect)_
     {
         UITabBar *orig = %orig;
         orig.barStyle = UIBarStyleBlack;
@@ -112,14 +112,14 @@ General Stuff
 %end
 
 %hook UICollectionView
-    - (void) setBackgroundColor:(id)arg1
+    - (void) setBackgroundColor:(id)_
     {
         %orig(PHONE_GREY);
     }
 %end
 
 %hook UITableView
-    - (void) setSeparatorStyle:(int)a
+    - (void) setSeparatorStyle:(int)_
     {
         %orig;
         if (hideTableSeparatorsEnabled)
@@ -127,13 +127,13 @@ General Stuff
             %orig(0);
         }
     }
-    - (void) setBackgroundColor:(id)arg1
+    - (void) setBackgroundColor:(id)_
     {
         %orig(PHONE_GREY);
     }
 %end
 %hook UITableViewCell
-    - (void) setBackgroundColor:(id)arg1
+    - (void) setBackgroundColor:(id)_
     {  
         if (colorIsEqualToColorWithTolerance(self.backgroundColor, [UIColor whiteColor], 0.2))
             %orig([UIColor clearColor]);
@@ -147,7 +147,7 @@ General Stuff
 
 // Get all black text elements and make them white
 %hook UILabel
-    - (void) setTextColor:(UIColor *)arg1
+    - (void) setTextColor:(UIColor *)_
     {
         %orig;
         if (colorIsEqualToColorWithTolerance(self.textColor, [UIColor blackColor], 0.25))
@@ -159,7 +159,7 @@ General Stuff
 
 // Get all white elements and make them grey
 %hook UIView
-    - (void) setBackgroundColor:(UIColor *)arg1
+    - (void) setBackgroundColor:(UIColor *)_
     {
         %orig;
 
@@ -172,26 +172,26 @@ General Stuff
 
 // Make text in fields white (both are needed for a few select fields)
 %hook UITextField
-    - (id) initWithFrame:(CGRect)arg1
+    - (id) initWithFrame:(CGRect)_
     {
         UITextField *orig = %orig;
         orig.textColor = [UIColor whiteColor];
         return orig;
     }
-    - (void) setTextColor:(UIColor *)arg1 
+    - (void) setTextColor:(UIColor *)_ 
     {
         %orig([UIColor whiteColor]);
     }
 %end
 
 %hook UITextView
-    - (id) initWithFrame:(CGRect)arg1
+    - (id) initWithFrame:(CGRect)_
     {
         UITextView *orig = %orig;
         orig.textColor = [UIColor whiteColor];
         return orig;
     }
-    - (void) setTextColor:(UIColor *)arg1 
+    - (void) setTextColor:(UIColor *)_
     {
         %orig([UIColor whiteColor]);
     }
@@ -215,7 +215,7 @@ General Stuff
 
 // Top bar white text
 %hook _UINavigationBarContentView
-    - (void) setTextColor:(UIColor *)arg1 
+    - (void) setTextColor:(UIColor *)_
     {
         %orig([UIColor whiteColor]);
     }
@@ -223,7 +223,7 @@ General Stuff
 
 // Get white titles
 %hook UINavigationBar
-    - (id) initWithFrame:(CGRect)arg1
+    - (id) initWithFrame:(CGRect)_
     {
         UINavigationBar *orig = %orig;
         [orig setBarStyle: 1]; //1 for white text
@@ -238,7 +238,7 @@ Keypad Tab
 
 */
 %hook PHHandsetDialerView
-    - (void) setBackgroundColor:(UIColor *)arg1
+    - (void) setBackgroundColor:(UIColor *)_
     {
         %orig(PHONE_GREY);
     }
@@ -247,10 +247,10 @@ Keypad Tab
 //keypad buttons
 %hook TPNumberPadButton
     /* Get white assets for keypad (These have to be loaded manually otherwise they stay in the Phone App's cache and will stay white) */
-    +(id)imageForCharacter:(unsigned)arg1 highlighted:(BOOL)arg2 whiteVersion:(BOOL)arg3
+    +(id)imageForCharacter:(unsigned)character highlighted:(BOOL)highlightedBOOL whiteVersion:(BOOL)whiteVersionBOOL
     {
         NSString *imagesPath = @"/Library/PreferenceBundles/DarkPhone12.bundle/keypad_images";
-        NSString *imageFile = [NSString stringWithFormat:@"%@/number%i.png", imagesPath, arg1];
+        NSString *imageFile = [NSString stringWithFormat:@"%@/number%i.png", imagesPath, character];
         UIImage *imgForCharacter = [UIImage imageWithContentsOfFile:imageFile];
         if (imgForCharacter)
         {
@@ -259,7 +259,7 @@ Keypad Tab
         } 
         else 
         {
-            NSLog(@"Keypad image %i could not be loaded", arg1);
+            NSLog(@"Keypad image %i could not be loaded", character);
         }
         return %orig;
     }
@@ -281,14 +281,15 @@ Keypad Tab
 
 //fix the delete button
 %hook PHHandsetDialerDeleteButton
-    - (void) setTintColor:(UIColor *)arg1 
+    - (void) setTintColor:(UIColor *)_
     {
         %orig([UIColor whiteColor]);
     }
 %end
 
+//Call button color
 %hook PHBottomBarButton
-    - (void) setBackgroundColor:(UIColor *)arg1
+    - (void) setBackgroundColor:(UIColor *)_
     {
         %orig;
         if (customColorEnabled)
@@ -304,14 +305,14 @@ Contacts Tab
 
 */
 %hook CNContactHeaderDisplayView
-    - (void) setBackgroundColor:(id)arg1
+    - (void) setBackgroundColor:(id)_
     {
         %orig(PHONE_GREY);
     }
 %end
 
 %hook CNActionsView
-    - (void) setBackgroundColor:(UIColor *)arg1
+    - (void) setBackgroundColor:(UIColor *)_
     {
         %orig;
         [[self superview] setBackgroundColor:PHONE_GREY];
@@ -319,7 +320,7 @@ Contacts Tab
 %end
 
 %hook CNContactListTableViewCell
-    - (void) setBackgroundColor:(id)arg1
+    - (void) setBackgroundColor:(id)_
     {
         for (UIView *v in [self subviews])
         {
@@ -331,7 +332,7 @@ Contacts Tab
 %end
 
 %hook CNContactActionCell
-    - (void) setBackgroundColor:(id)arg1
+    - (void) setBackgroundColor:(id)_
     {
         for (UIView *v in [self subviews])
         {
@@ -343,7 +344,7 @@ Contacts Tab
 %end
 
 %hook CNPropertyPhoneNumberCell
-    - (void) setBackgroundColor:(id)arg1
+    - (void) setBackgroundColor:(id)_
     {
         for (UIView *v in [self subviews])
         {
@@ -355,7 +356,7 @@ Contacts Tab
 %end
 
 %hook CNPropertyEmailAddressCell
-    - (void) setBackgroundColor:(id)arg1
+    - (void) setBackgroundColor:(id)_
     {
         for (UIView *v in [self subviews])
         {
@@ -367,7 +368,7 @@ Contacts Tab
 %end
 
 %hook CNUINavigationListViewCell
-    - (void) setBackgroundColor:(UIColor *)arg1
+    - (void) setBackgroundColor:(UIColor *)_
     {
         %orig;
         for (UITableViewCellContentView *v in [self subviews])
@@ -378,7 +379,7 @@ Contacts Tab
 %end
 
 %hook UITableViewLabel
-    - (void) setBackgroundColor:(id)arg1
+    - (void) setBackgroundColor:(id)_
     {
         %orig([UIColor clearColor]);
     }
