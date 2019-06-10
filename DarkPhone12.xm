@@ -6,7 +6,6 @@ Copyright (C) shepgoba 2019
 */
 #import <substrate.h>
 #import <libcolorpicker.h>
-#import <objc/runtime.h>
 #import "DarkPhone12.h"
 
 BOOL enabled, trueBlackEnabled, customColorEnabled, hideTableSeparatorsEnabled;
@@ -135,12 +134,10 @@ General Stuff
 %hook UITableViewCell
     - (void) setBackgroundColor:(id)_
     {  
+        %orig;
         if (colorIsEqualToColorWithTolerance(self.backgroundColor, [UIColor whiteColor], 0.2))
-            %orig([UIColor clearColor]);
-
-        if ([[self superview] isKindOfClass:objc_getClass("CNContactListTableView")])
         {
-            %orig(CELL_GREY);
+            %orig([UIColor clearColor]);
         }
     }
 %end
@@ -316,6 +313,17 @@ Contacts Tab
     {
         %orig;
         [[self superview] setBackgroundColor:PHONE_GREY];
+    }
+%end
+
+%hook CNContactListTableView
+    - (void) setBackgroundColor:(UIColor *)_
+    {
+        %orig(PHONE_GREY);
+        for (UITableViewCell *cell in [self subviews])
+        {
+            cell.backgroundColor = CELL_GREY;
+        }
     }
 %end
 
