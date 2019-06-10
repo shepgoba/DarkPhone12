@@ -7,14 +7,12 @@ Copyright (C) shepgoba 2019
 
 #import <substrate.h>
 #import <libcolorpicker.h>
+#import <objc/runtime.h>
 #import "DarkPhone12.h"
 
-BOOL enabled, trueBlackEnabled;
+BOOL enabled, trueBlackEnabled, customColorEnabled, hideTableSeparatorsEnabled;
 
-UIColor *PHONE_GREY;
-UIColor *CELL_GREY;
-
-UIColor *TINT_COLOR;
+UIColor *PHONE_GREY, *CELL_GREY, *TINT_COLOR;
 
 static void initPrefs() 
 {
@@ -34,6 +32,9 @@ static void loadPrefs()
     {
         enabled = [prefs objectForKey:@"enabled"] ? [[prefs objectForKey:@"enabled"] boolValue] : YES;
         trueBlackEnabled = [prefs objectForKey:@"trueBlackEnabled"] ? [[prefs objectForKey:@"trueBlackEnabled"] boolValue] : YES;
+        customColorEnabled = [prefs objectForKey:@"customColorEnabled"] ? [[prefs objectForKey:@"customColorEnabled"] boolValue] : NO;
+        hideTableSeparatorsEnabled = [prefs objectForKey:@"hideTableSeparatorsEnabled"] ? [[prefs objectForKey:@"hideTableSeparatorsEnabled"] boolValue] : NO;
+
     }
 
     if (trueBlackEnabled)
@@ -81,13 +82,35 @@ General Stuff
 */
 
 %group Tweak
+%hook PhoneRootView
+    - (id) initWithFrame:(CGRect)_
+    {
+        /* Make the keyboard black */
+        [[UITextField appearance] setKeyboardAppearance:UIKeyboardAppearanceAlert];
 
-// Set the tint color theme
-%hook UILayoutContainerView
+        /* Set tint color theme */
+        if (customColorEnabled)
+        {
+            [[UIView appearance] setTintColor:TINT_COLOR];
+        }
+        /* Set headers to grey */
+        [[UITableViewHeaderFooterView appearance] setTintColor:CELL_GREY];
+
+        /* Top bar */
+        [[UINavigationBar appearance] setBarTintColor:PHONE_GREY];
+        [[UINavigationBar appearance] setTranslucent:NO];
+        
+        [[UIToolbar appearance] setBarTintColor:PHONE_GREY];
+        
+        return %orig;
+    }
+%end
+
+%hook UITabBar
     - (id) initWithFrame:(CGRect)arg1
     {
-        UILayoutContainerView *orig = %orig;
-        [orig setTintColor:TINT_COLOR];
+        UITabBar *orig = %orig;
+        orig.barStyle = UIBarStyleBlack;
         return orig;
     }
 %end
@@ -100,10 +123,23 @@ General Stuff
 %end
 
 %hook UITableView
+    - (void) setSeparatorStyle:(unsigned)a
+    {
+        %orig;
+        if (hideTableSeparatorsEnabled)
+        {
+            %orig(0);
+        }
+    }
     - (void) setBackgroundColor:(id)arg1
     {
+        // /[self setSeparatorColor:TINT_COLOR];
         %orig(PHONE_GREY);
     }
+    /*- (void) setSeparatorColor:(id)arg1
+    {
+        %orig(CELL_GREY);
+    }*/
 %end
 %hook UITableViewCell
     - (void) setBackgroundColor:(id)arg1
@@ -181,16 +217,6 @@ General Stuff
     }
 %end
 
-// Top bar grey
-%hook _UIVisualEffectSubview
-    - (void) setBackgroundColor:(id)arg1
-    {
-        //%orig;
-        //if (colorIsEqualToColorWithTolerance(self.backgroundColor, [UIColor whiteColor], 0.2))
-           %orig(PHONE_GREY);
-    }
-%end
-
 // Top bar white text
 %hook _UINavigationBarContentView
     - (void) setTextColor:(UIColor *)arg1 
@@ -223,27 +249,26 @@ Keypad Tab
 %end
 
 //keypad buttons
-%hook PHHandsetDialerNumberPadButton
-    /* Get white assets for keypad (These have to be loaded manually otherwise they stay in the Phone App's cache) */
+%hook TPNumberPadButton
+    /* Get white assets for keypad (These have to be loaded manually otherwise they stay in the Phone App's cache and will stay white) */
     +(id)imageForCharacter:(unsigned)arg1 highlighted:(BOOL)arg2 whiteVersion:(BOOL)arg3
     {
-
-        if (enabled)
+        NSString *imagesPath = @"/Library/PreferenceBundles/DarkPhone12.bundle/keypad_images";
+        NSString *imageFile = [NSString stringWithFormat:@"%@/number%i.png", imagesPath, arg1];
+        UIImage *imgForCharacter = [UIImage imageWithContentsOfFile:imageFile];
+        if (imgForCharacter)
         {
-            NSString *imagesPath = @"/Library/PreferenceBundles/DarkPhone12.bundle/keypad_images";
-            NSString *imageFile = [NSString stringWithFormat:@"%@/number%i.png", imagesPath, arg1];
-            UIImage *imgForCharacter = [UIImage imageWithContentsOfFile:imageFile];
-            if (imgForCharacter)
-            {
-                UIImage *scaledImage = [UIImage imageWithCGImage:[imgForCharacter CGImage] scale:(imgForCharacter.scale * 2) orientation:(imgForCharacter.imageOrientation)];
-                return scaledImage;
-            } else 
-            {
-                NSLog(@"image could not be loaded");
-            }
+            UIImage *scaledImage = [UIImage imageWithCGImage:[imgForCharacter CGImage] scale:(imgForCharacter.scale * 2) orientation:(imgForCharacter.imageOrientation)];
+            return scaledImage;
+        } 
+        else 
+        {
+            NSLog(@"image could not be loaded");
         }
         return %orig;
     }
+%end
+%hook TPNumberPadLightStyleButton
     + (double) unhighlightedCircleViewAlpha
     {
         return 0.25;
@@ -269,7 +294,10 @@ Keypad Tab
 %hook PHBottomBarButton
     - (void) setBackgroundColor:(UIColor *)arg1
     {
-        %orig(TINT_COLOR);
+        if (customColorEnabled)
+        {
+            %orig(TINT_COLOR);
+        }
     }
 %end
 
@@ -285,12 +313,27 @@ Contacts Tab
     }
 %end
 
-%hook CNContactListTableView
-    - (void) setBackgroundColor:(id)arg1
+/*%hook CNContactListTableView
+   - (void) setBackgroundColor:(id)arg1
     {
         %orig(PHONE_GREY);
     }
-%end
+    - (id) initWithCoder:(id)arg1
+    {
+        CNContactListTableView *orig = %orig;
+         for (UITableViewHeaderFooterView *x in [orig subviews])
+        {
+            if ([x isKindOfClass:[UITableViewHeaderFooterView class]])
+            {
+                UIView * view = [[UIView alloc] initWithFrame:x.bounds];
+                view.backgroundColor = CELL_GREY;
+                x.backgroundView = view;
+                NSLog(@"69420$ operation completed");
+            }
+        }
+        return orig;
+    }
+%end*/
 
 %hook CNActionsView
     - (void) setBackgroundColor:(UIColor *)arg1
@@ -348,18 +391,6 @@ Contacts Tab
     }
 %end
 
-%hook CNContactListHeaderFooterView
-    - (id) initWithReuseIdentifier:(id)arg1
-    {
-        CNContactListHeaderFooterView *orig = %orig;
-        for (UIView *v in [orig subviews])
-        {
-            [v setBackgroundColor:CELL_GREY];
-        }
-        return orig;
-    }
-
-%end
 %hook CNUINavigationListViewCell
     - (void) setBackgroundColor:(UIColor *)arg1
     {
@@ -370,27 +401,11 @@ Contacts Tab
         }
     }
 %end
+
 %hook UITableViewLabel
     - (void) setBackgroundColor:(id)arg1
     {
         %orig([UIColor clearColor]);
-    }
-%end
-
-%hook TKVibrationRecorderTouchSurface
-    - (id) initWithFrame:(CGRect)_
-    {
-        TKVibrationRecorderTouchSurface *orig = %orig;
-        for (UILabel *l in [orig subviews])
-        {
-            if ([l isKindOfClass:[UILabel class]])
-            {
-                l.opaque = NO;
-                l.textColor = [UIColor blackColor];
-            }
-        }
-        [orig setBackgroundColor:PHONE_GREY];
-        return orig;
     }
 %end
 
@@ -415,8 +430,13 @@ static void settingsUpdated(CFNotificationCenterRef center, void *observer, CFSt
     if (enabled)
     {
         /* Make the keyboard black */
-        [[UITextField appearance] setKeyboardAppearance:UIKeyboardAppearanceAlert];
+        //[[UITextField appearance] setKeyboardAppearance:UIKeyboardAppearanceAlert];
 
+        /* Set tint color theme */
+        //[[UIView appearance] setTintColor:TINT_COLOR];
+
+        /* Set headers to grey */
+        //[[UITableViewHeaderFooterView appearance] setTintColor:CELL_GREY];
         %init(Tweak);
     }
 }

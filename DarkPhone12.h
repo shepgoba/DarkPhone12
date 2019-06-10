@@ -21,3 +21,12 @@
 
 @interface _UIVisualEffectSubview : UIView
 @end
+@interface UIButtonLabel : UILabel
+-(void)setTextColor:(id)arg1 ;
+@end
+@interface TKVibrationRecorderTouchSurface : UIView
+@end
+@interface TKVibrationRecorderRippleView : UIView
+@end
+@interface TKVibrationRecorderContentViewController : UIViewController
+@end
