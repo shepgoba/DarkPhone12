@@ -4,14 +4,12 @@ DarkPhone12
 
 Copyright (C) shepgoba 2019
 */
-
 #import <substrate.h>
 #import <libcolorpicker.h>
 #import <objc/runtime.h>
 #import "DarkPhone12.h"
 
 BOOL enabled, trueBlackEnabled, customColorEnabled, hideTableSeparatorsEnabled;
-
 UIColor *PHONE_GREY, *CELL_GREY, *TINT_COLOR;
 
 static void initPrefs() 
@@ -261,7 +259,7 @@ Keypad Tab
         } 
         else 
         {
-            NSLog(@"image could not be loaded");
+            NSLog(@"Keypad image %i could not be loaded", arg1);
         }
         return %orig;
     }
@@ -292,6 +290,7 @@ Keypad Tab
 %hook PHBottomBarButton
     - (void) setBackgroundColor:(UIColor *)arg1
     {
+        %orig;
         if (customColorEnabled)
         {
             %orig(TINT_COLOR);

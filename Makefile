@@ -14,4 +14,5 @@ SUBPROJECTS += prefs
 include $(THEOS_MAKE_PATH)/aggregate.mk
 
 after-install::
+	echo "Tec-9 Rush B"
 	install.exec "killall -9 SpringBoard"
