@@ -8,7 +8,8 @@ Copyright (C) shepgoba 2019
 #import <libcolorpicker.h>
 #import "DarkPhone12.h"
 
-BOOL enabled, trueBlackEnabled, customColorEnabled, hideTableSeparatorsEnabled;
+BOOL enabled, trueBlackEnabled, customColorEnabled, hideTableSeparatorsEnabled, DEBUG_ENABLED;
+
 UIColor *PHONE_GREY, *CELL_GREY, *TINT_COLOR;
 
 static void initPrefs() 
@@ -24,18 +25,26 @@ static void initPrefs()
 static void loadPrefs()
 {
     NSDictionary *prefs = [NSMutableDictionary dictionaryWithContentsOfFile:PREFS_PATH];
-    
+
+    DEBUG_ENABLED = NO;
+
     if (prefs)
     {
         enabled = [prefs objectForKey:@"enabled"] ? [[prefs objectForKey:@"enabled"] boolValue] : YES;
         trueBlackEnabled = [prefs objectForKey:@"trueBlackEnabled"] ? [[prefs objectForKey:@"trueBlackEnabled"] boolValue] : YES;
         customColorEnabled = [prefs objectForKey:@"customColorEnabled"] ? [[prefs objectForKey:@"customColorEnabled"] boolValue] : NO;
         hideTableSeparatorsEnabled = [prefs objectForKey:@"hideTableSeparatorsEnabled"] ? [[prefs objectForKey:@"hideTableSeparatorsEnabled"] boolValue] : NO;
-        NSLog(@"{shepgoba}{DarkPhone12} DarkPhone12 prefs successfully loaded!");
+        if (DEBUG_ENABLED)
+        {
+            NSLog(@"{shepgoba}{DarkPhone12} Prefs successfully loaded!");
+        }
     }
     else
     {
-        NSLog(@"{shepgoba} ERROR: DarkPhone12 prefs could not be loaded");
+        if (DEBUG_ENABLED)
+        {
+            NSLog(@"{shepgoba} ERROR: Prefs could not be loaded");
+        }
         enabled = YES;
         trueBlackEnabled = YES;
         customColorEnabled = NO;
@@ -46,13 +55,19 @@ static void loadPrefs()
     {
         PHONE_GREY = UIColorMake(0, 0, 0, 1);
         CELL_GREY = UIColorMake(20, 20, 20, 1);
-        NSLog(@"{shepgoba}{DarkPhone12} DarkPhone12 colors set to black");
+        if (DEBUG_ENABLED)
+        {
+            NSLog(@"{shepgoba}{DarkPhone12} Colors set to black");
+        }
     } 
     else 
     {
         PHONE_GREY = UIColorMake(20, 20, 20, 1);
         CELL_GREY = UIColorMake(40, 40, 40, 1);
-        NSLog(@"{shepgoba}{DarkPhone12} DarkPhone12 colors set to dark gray");
+        if (DEBUG_ENABLED)
+        {
+            NSLog(@"{shepgoba}{DarkPhone12} Colors set to dark gray");
+        }
     }
 
     if (customColorEnabled)
@@ -61,17 +76,27 @@ static void loadPrefs()
         if (colorPrefs)
         {
             TINT_COLOR = LCPParseColorString([colorPrefs objectForKey:@"tintColor"], @"#007AFF");
-            NSLog(@"{shepgoba}{DarkPhone12} Tint color loaded fine");
+            if (DEBUG_ENABLED)
+            {
+                NSLog(@"{shepgoba}{DarkPhone12} Tint color loaded fine");
+            }
         }
         else 
         {
             TINT_COLOR = APPLE_DEFAULT_BLUE;
-            NSLog(@"{shepgoba}{DarkPhone12} Tint color set to default (colorprefs didnt load)");
+            if (DEBUG_ENABLED)
+            {
+                NSLog(@"{shepgoba}{DarkPhone12} Tint color set to default (colorprefs didnt load)");
+            }
         }
     }
     else
     {
-        NSLog(@"{shepgoba}{DarkPhone12} Not loading color prefs (no custom color)");
+        TINT_COLOR = APPLE_DEFAULT_BLUE;
+        if (DEBUG_ENABLED)
+        {
+            NSLog(@"{shepgoba}{DarkPhone12} Not loading color prefs (no custom color)");
+        }
     }
 
 }
@@ -145,11 +170,7 @@ General Stuff
 %hook UITableViewCell
     - (void) setBackgroundColor:(id)_
     {  
-        //%orig;
-        //if (colorIsEqualToColorWithTolerance(self.backgroundColor, [UIColor whiteColor], 0.2))
-       // {
-        //    %orig([UIColor clearColor]);
-        //}
+
     }
 %end
 
@@ -158,7 +179,7 @@ General Stuff
     - (void) setTextColor:(UIColor *)_
     {
         %orig;
-        if (colorIsEqualToColorWithTolerance(self.textColor, [UIColor blackColor], 0.25))
+        if (colorIsEqualToColorWithTolerance(self.textColor, [UIColor blackColor], 0.15))
         {
             %orig([UIColor whiteColor]);
         }
@@ -175,12 +196,6 @@ General Stuff
         {
             %orig(PHONE_GREY);
         } 
-        
-        /* Kind of a hack to only get contact section headers grey */
-        if ([[self superview] isKindOfClass:[UITableViewHeaderFooterView class]] && self.frame.size.height < 30)
-        {
-            %orig(CELL_GREY);
-        }
     }
 %end
 
@@ -269,7 +284,10 @@ Keypad Tab
         if (imgForCharacter)
         {
             UIImage *scaledImage = [UIImage imageWithCGImage:[imgForCharacter CGImage] scale:(imgForCharacter.scale * 2) orientation:(imgForCharacter.imageOrientation)];
-            NSLog(@"{shepgoba}{DarkPhone12} Keypad image %i loaded fine ", character);
+            if (DEBUG_ENABLED)
+            {
+                NSLog(@"{shepgoba}{DarkPhone12} Keypad image %i loaded fine ", character);
+            }
             return scaledImage;
         } 
         else 
@@ -319,18 +337,19 @@ Keypad Tab
 Contacts Tab
 
 */
+%hook UITableViewHeaderFooterView
+    - (UILabel *) textLabel
+    {
+        UILabel *orig = %orig;
+        [orig setTextColor:TINT_COLOR];
+        return orig;
+    }
+%end
+
 %hook CNContactHeaderDisplayView
     - (void) setBackgroundColor:(id)_
     {
         %orig(PHONE_GREY);
-    }
-%end
-
-%hook CNActionsView
-    - (void) setBackgroundColor:(UIColor *)_
-    {
-        %orig;
-        [[self superview] setBackgroundColor:PHONE_GREY];
     }
 %end
 
@@ -340,19 +359,6 @@ Contacts Tab
         %orig(PHONE_GREY);
     }
 %end
-
-/*%hook CNContactListTableViewCell
-    - (void) setBackgroundColor:(id)_
-    {
-        for (UIView *v in [self subviews])
-        {
-            if ([v isKindOfClass:[UIView class]])
-                [v setBackgroundColor:CELL_GREY];
-        }
-
-        %orig(CELL_GREY);
-    }
-%end*/
 
 %hook CNContactActionCell
     - (void) setBackgroundColor:(id)_
@@ -394,10 +400,6 @@ Contacts Tab
     - (void) setBackgroundColor:(UIColor *)_
     {
         %orig;
-        for (UITableViewCellContentView *v in [self subviews])
-        {
-            [v setBackgroundColor:CELL_GREY];
-        }
     }
 %end
 
@@ -417,8 +419,11 @@ static void settingsUpdated(CFNotificationCenterRef center, void *observer, CFSt
 
 %ctor
 {
-    NSLog(@"{shepgoba}{DarkPhone12} ****************************************");
-    NSLog(@"{shepgoba}{DarkPhone12} Beginning initialization of DarkPhone12");
+    if (DEBUG_ENABLED)
+    {
+        NSLog(@"{shepgoba}{DarkPhone12} ****************************************");
+        NSLog(@"{shepgoba}{DarkPhone12} Beginning initialization of DarkPhone12");
+    }
     CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), 
         NULL, 
         settingsUpdated, 
@@ -447,6 +452,9 @@ static void settingsUpdated(CFNotificationCenterRef center, void *observer, CFSt
         [[UIToolbar appearance] setBarTintColor:PHONE_GREY];
         
         %init(Tweak);
-        NSLog(@"{shepgoba}{DarkPhone12} Tweak finished loading successfully!");
+        if (DEBUG_ENABLED)
+        {
+            NSLog(@"{shepgoba}{DarkPhone12} Tweak finished loading successfully!");
+        }
     }
 }

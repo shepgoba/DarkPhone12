@@ -7,3 +7,5 @@
 
 @interface UITableViewCellContentView : UIView
 @end
+@interface _UITableViewHeaderFooterViewLabel : UILabel
+@end
