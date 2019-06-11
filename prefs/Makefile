@@ -1,8 +1,7 @@
 include $(THEOS)/makefiles/common.mk
 
-ARCHS = arm64 arm64e
-SDK_VERSION=11.2
-SYSROOT=$(THEOS)/sdks/iPhoneOS11.2.sdk
+SDK_VERSION = 11.2
+SYSROOT = $(THEOS)/sdks/iPhoneOS11.2.sdk
 
 BUNDLE_NAME = DarkPhone12
 DarkPhone12_FILES = DarkPhone12Prefs.m

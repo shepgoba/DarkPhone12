@@ -1,5 +1,6 @@
 include $(THEOS)/makefiles/common.mk
-ARCHS = arm64 arm64e
+
+export ARCHS = arm64 arm64e
 
 TWEAK_NAME = DarkPhone12
 DarkPhone12_FILES = DarkPhone12.xm
