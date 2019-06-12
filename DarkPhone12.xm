@@ -337,14 +337,15 @@ Keypad Tab
 Contacts Tab
 
 */
-%hook UITableViewHeaderFooterView
+
+/*%hook UITableViewHeaderFooterView
     - (UILabel *) textLabel
     {
         UILabel *orig = %orig;
         [orig setTextColor:TINT_COLOR];
         return orig;
     }
-%end
+%end*/
 
 %hook CNContactHeaderDisplayView
     - (void) setBackgroundColor:(id)_
@@ -419,11 +420,6 @@ static void settingsUpdated(CFNotificationCenterRef center, void *observer, CFSt
 
 %ctor
 {
-    if (DEBUG_ENABLED)
-    {
-        NSLog(@"{shepgoba}{DarkPhone12} ****************************************");
-        NSLog(@"{shepgoba}{DarkPhone12} Beginning initialization of DarkPhone12");
-    }
     CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(), 
         NULL, 
         settingsUpdated, 
@@ -450,6 +446,8 @@ static void settingsUpdated(CFNotificationCenterRef center, void *observer, CFSt
         [[UINavigationBar appearance] setTranslucent:NO];
         
         [[UIToolbar appearance] setBarTintColor:PHONE_GREY];
+
+        [[UITableViewHeaderFooterView appearance] setTintColor:CELL_GREY];
         
         %init(Tweak);
         if (DEBUG_ENABLED)
