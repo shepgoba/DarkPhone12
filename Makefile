@@ -2,6 +2,9 @@ include $(THEOS)/makefiles/common.mk
 
 export ARCHS = arm64 arm64e
 
+FINALPACKAGE=1
+DEBUG = 0
+
 TWEAK_NAME = DarkPhone12
 DarkPhone12_FILES = DarkPhone12.xm
 DarkPhone12_FRAMEWORKS = UIKit

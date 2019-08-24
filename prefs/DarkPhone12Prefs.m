@@ -18,12 +18,12 @@
 
 - (void) respringDevice 
 {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Apply settings?" message:@"This will respring your device" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Apply settings?" message:@"This will close the phone app" preferredStyle:UIAlertControllerStyleAlert];
     
     UIAlertAction *ok = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) 
     {
         pid_t pid;
-        const char* args[] = {"killall", "-9", "backboardd", NULL};
+        const char* args[] = {"killall", "-9", "SpringBoard", NULL};
         posix_spawn(&pid, "/usr/bin/killall", NULL, NULL, (char* const*)args, NULL);
     }];
 

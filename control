@@ -1,7 +1,7 @@
 Package: com.shepgoba.darkphone12
 Name: DarkPhone12
-Depends: mobilesubstrate, me.nepeta.libcolorpicker
-Version: 1.0
+Depends: mobilesubstrate, org.thebigboss.libcolorpicker
+Version: 1.0.2
 Architecture: iphoneos-arm
 Description: Full dark mode for the phone app!
 Maintainer: shepgoba <shepgoba@gmail.com>

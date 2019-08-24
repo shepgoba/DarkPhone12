@@ -9,3 +9,22 @@
 @end
 @interface _UITableViewHeaderFooterViewLabel : UILabel
 @end
+@interface MPVoicemailMessageTableViewCell : UIView
+@end
+@interface TPTableViewCell : UITableViewCell
+{
+    UIView* _foregroundView;
+}
+@property (nonatomic,readonly) UIView * foregroundView;
+@end
+@implementation TPTableViewCell
+@synthesize foregroundView=_foregroundView;
+@end
+@interface MPVoicemailMailboxTableViewCell : TPTableViewCell
+@end
+
+@interface MPVoicemailMessageTableViewCellScrollView : UIView
+@end
+
+@interface CNContactListHeaderFooterView : UITableViewCell
+@end

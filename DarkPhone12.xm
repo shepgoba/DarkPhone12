@@ -7,8 +7,11 @@ Copyright (C) shepgoba 2019
 #import <substrate.h>
 #import <libcolorpicker.h>
 #import "DarkPhone12.h"
+#ifdef DEBUG
+#undef DEBUG
+#endif
 
-BOOL enabled, trueBlackEnabled, customColorEnabled, hideTableSeparatorsEnabled, DEBUG_ENABLED;
+BOOL enabled, trueBlackEnabled, customColorEnabled, hideTableSeparatorsEnabled;
 
 UIColor *PHONE_GREY, *CELL_GREY, *TINT_COLOR;
 
@@ -25,26 +28,21 @@ static void initPrefs()
 static void loadPrefs()
 {
     NSDictionary *prefs = [NSMutableDictionary dictionaryWithContentsOfFile:PREFS_PATH];
-
-    DEBUG_ENABLED = NO;
-
     if (prefs)
     {
         enabled = [prefs objectForKey:@"enabled"] ? [[prefs objectForKey:@"enabled"] boolValue] : YES;
         trueBlackEnabled = [prefs objectForKey:@"trueBlackEnabled"] ? [[prefs objectForKey:@"trueBlackEnabled"] boolValue] : YES;
         customColorEnabled = [prefs objectForKey:@"customColorEnabled"] ? [[prefs objectForKey:@"customColorEnabled"] boolValue] : NO;
         hideTableSeparatorsEnabled = [prefs objectForKey:@"hideTableSeparatorsEnabled"] ? [[prefs objectForKey:@"hideTableSeparatorsEnabled"] boolValue] : NO;
-        if (DEBUG_ENABLED)
-        {
+        #ifdef DEBUG
             NSLog(@"{shepgoba}{DarkPhone12} Prefs successfully loaded!");
-        }
+        #endif
     }
     else
     {
-        if (DEBUG_ENABLED)
-        {
+        #ifdef DEBUG
             NSLog(@"{shepgoba} ERROR: Prefs could not be loaded");
-        }
+        #endif
         enabled = YES;
         trueBlackEnabled = YES;
         customColorEnabled = NO;
@@ -55,19 +53,17 @@ static void loadPrefs()
     {
         PHONE_GREY = UIColorMake(0, 0, 0, 1);
         CELL_GREY = UIColorMake(20, 20, 20, 1);
-        if (DEBUG_ENABLED)
-        {
+        #ifdef DEBUG
             NSLog(@"{shepgoba}{DarkPhone12} Colors set to black");
-        }
+        #endif
     } 
     else 
     {
         PHONE_GREY = UIColorMake(20, 20, 20, 1);
         CELL_GREY = UIColorMake(40, 40, 40, 1);
-        if (DEBUG_ENABLED)
-        {
+        #ifdef DEBUG
             NSLog(@"{shepgoba}{DarkPhone12} Colors set to dark gray");
-        }
+        #endif
     }
 
     if (customColorEnabled)
@@ -76,27 +72,24 @@ static void loadPrefs()
         if (colorPrefs)
         {
             TINT_COLOR = LCPParseColorString([colorPrefs objectForKey:@"tintColor"], @"#007AFF");
-            if (DEBUG_ENABLED)
-            {
+            #ifdef DEBUG
                 NSLog(@"{shepgoba}{DarkPhone12} Tint color loaded fine");
-            }
+            #endif
         }
         else 
         {
             TINT_COLOR = APPLE_DEFAULT_BLUE;
-            if (DEBUG_ENABLED)
-            {
+            #ifdef DEBUG
                 NSLog(@"{shepgoba}{DarkPhone12} Tint color set to default (colorprefs didnt load)");
-            }
+            #endif
         }
     }
     else
     {
         TINT_COLOR = APPLE_DEFAULT_BLUE;
-        if (DEBUG_ENABLED)
-        {
+        #ifdef DEBUG
             NSLog(@"{shepgoba}{DarkPhone12} Not loading color prefs (no custom color)");
-        }
+        #endif
     }
 
 }
@@ -114,6 +107,7 @@ BOOL colorIsEqualToColorWithTolerance(UIColor *color1, UIColor *color2, CGFloat 
         fabs(b1 - b2) <= tolerance &&
         fabs(a1 - a2) <= tolerance;
 }
+
 //https://stackoverflow.com/questions/6496441/creating-a-uiimage-from-a-uicolor-to-use-as-a-background-image-for-uibutton
 UIImage* imageFromColor(UIColor *color) 
 {
@@ -166,6 +160,12 @@ General Stuff
     {
         %orig(PHONE_GREY);
     }
+    -(void)layoutSubviews
+    {
+        %orig;
+
+        self.backgroundView.backgroundColor = NULL;
+    }
 %end
 %hook UITableViewCell
     - (void) setBackgroundColor:(id)_
@@ -192,11 +192,13 @@ General Stuff
     {
         %orig;
 
-        if (colorIsEqualToColorWithTolerance(self.backgroundColor, [UIColor whiteColor], 0.06)) 
+        if (colorIsEqualToColorWithTolerance(self.backgroundColor, [UIColor whiteColor], 0.06))
         {
             %orig(PHONE_GREY);
-        } 
+        }
+
     }
+
 %end
 
 // Make text in fields white (both are needed for a few select fields)
@@ -284,10 +286,9 @@ Keypad Tab
         if (imgForCharacter)
         {
             UIImage *scaledImage = [UIImage imageWithCGImage:[imgForCharacter CGImage] scale:(imgForCharacter.scale * 2) orientation:(imgForCharacter.imageOrientation)];
-            if (DEBUG_ENABLED)
-            {
+            #ifdef DEBUG
                 NSLog(@"{shepgoba}{DarkPhone12} Keypad image %i loaded fine ", character);
-            }
+            #endif
             return scaledImage;
         } 
         else 
@@ -411,6 +412,22 @@ Contacts Tab
     }
 %end
 
+
+/*
+Voicemail Tab
+*/
+%hook MPVoicemailMailboxTableViewCell
+- (void) setBackgroundColor:(UIColor *)arg1
+{
+    %orig(PHONE_GREY);
+}
+- (void) layoutSubviews
+{
+    %orig;
+    self.foregroundView.backgroundColor = NULL;
+}
+%end
+
 %end
 
 static void settingsUpdated(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo){
@@ -448,11 +465,10 @@ static void settingsUpdated(CFNotificationCenterRef center, void *observer, CFSt
         [[UIToolbar appearance] setBarTintColor:PHONE_GREY];
 
         [[UITableViewHeaderFooterView appearance] setTintColor:CELL_GREY];
-        
+
         %init(Tweak);
-        if (DEBUG_ENABLED)
-        {
+        #ifdef DEBUG
             NSLog(@"{shepgoba}{DarkPhone12} Tweak finished loading successfully!");
-        }
+        #endif
     }
 }
