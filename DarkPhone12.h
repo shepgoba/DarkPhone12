@@ -28,3 +28,12 @@
 
 @interface CNContactListHeaderFooterView : UITableViewCell
 @end
+
+@interface PHHandsetDailerNumberPadButton : UIControl 
+@end
+
+@interface PHBottomBarButton : UIButton
+@end
+
+@interface PHHandsetDialerDeleteButton : UIControl
+@end

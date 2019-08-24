@@ -6,12 +6,14 @@ Copyright (C) shepgoba 2019
 */
 #import <substrate.h>
 #import <libcolorpicker.h>
+#import <objc/runtime.h>
 #import "DarkPhone12.h"
+
 #ifdef DEBUG
 #undef DEBUG
 #endif
 
-BOOL enabled, trueBlackEnabled, customColorEnabled, hideTableSeparatorsEnabled;
+BOOL enabled, trueBlackEnabled, customColorEnabled, hideTableSeparatorsEnabled, t9dialerenabled;
 
 UIColor *PHONE_GREY, *CELL_GREY, *TINT_COLOR;
 
@@ -268,14 +270,37 @@ General Stuff
 Keypad Tab
 
 */
-%hook PHHandsetDialerView
+
+%hook PHHandsetDialerView 
     - (void) setBackgroundColor:(UIColor *)_
     {
         %orig(PHONE_GREY);
     }
 %end
 
+
 //keypad buttons
+%hook TPDialerNumberPad
+    - (id) initWithFrame:(CGRect)arg1
+    {
+        return %orig;
+    }
+
+    - (void) buttonDown:(id) sender 
+    {
+        if (t9dialerenabled)
+        {
+            [UIView setAnimationsEnabled:NO];
+        }
+        %orig;
+        if (t9dialerenabled)
+        {
+            [UIView setAnimationsEnabled:YES];
+        }
+    }
+
+%end
+
 %hook TPNumberPadButton
     /* Get white assets for keypad (These have to be loaded manually otherwise they stay in the Phone App's cache and will stay white) */
     +(id)imageForCharacter:(unsigned)character highlighted:(BOOL)highlightedBOOL whiteVersion:(BOOL)whiteVersionBOOL
@@ -298,6 +323,7 @@ Keypad Tab
         return %orig;
     }
 %end
+
 %hook TPNumberPadLightStyleButton
     + (double) unhighlightedCircleViewAlpha
     {
@@ -313,12 +339,28 @@ Keypad Tab
     }
 %end
 
+
 //fix the delete button
 %hook PHHandsetDialerDeleteButton
     - (void) setTintColor:(UIColor *)_
     {
         %orig([UIColor whiteColor]);
-    } 
+    }
+%end
+
+%hook MPKeypadViewController
+    - (void) _deleteButtonClicked:(id)sender
+    {
+        if (t9dialerenabled)
+        {
+            [UIView setAnimationsEnabled:NO];
+        }
+        %orig;
+        if (t9dialerenabled)
+        {
+            [UIView setAnimationsEnabled:YES];
+        }
+    }
 %end
 
 //Call button color
@@ -329,6 +371,7 @@ Keypad Tab
         if (customColorEnabled)
         {
             %orig(TINT_COLOR);
+            
         }
     }
 %end
@@ -338,15 +381,6 @@ Keypad Tab
 Contacts Tab
 
 */
-
-/*%hook UITableViewHeaderFooterView
-    - (UILabel *) textLabel
-    {
-        UILabel *orig = %orig;
-        [orig setTextColor:TINT_COLOR];
-        return orig;
-    }
-%end*/
 
 %hook CNContactHeaderDisplayView
     - (void) setBackgroundColor:(id)_
@@ -416,6 +450,7 @@ Contacts Tab
 /*
 Voicemail Tab
 */
+
 %hook MPVoicemailMailboxTableViewCell
 - (void) setBackgroundColor:(UIColor *)arg1
 {
@@ -432,7 +467,9 @@ Voicemail Tab
 
 static void settingsUpdated(CFNotificationCenterRef center, void *observer, CFStringRef name, const void *object, CFDictionaryRef userInfo){
     loadPrefs();
+    #ifdef DEBUG
     NSLog(@"{shepgoba}{DarkPhone12} Preferences updated!");
+    #endif
 }
 
 %ctor
@@ -449,6 +486,20 @@ static void settingsUpdated(CFNotificationCenterRef center, void *observer, CFSt
         
     if (enabled)
     {
+        NSFileManager *fm = [NSFileManager defaultManager];
+        if ([fm fileExistsAtPath:@"/Library/MobileSubstrate/DynamicLibraries/T9Dialer.dylib"])
+        {
+            t9dialerenabled = true;
+        } 
+        else
+        {
+            t9dialerenabled = false;
+        }
+
+        #ifdef DEBUG
+        NSLog(@"%i", t9dialerenabled);
+        #endif
+
         /* Make the keyboard black */
         [[UITextField appearance] setKeyboardAppearance:UIKeyboardAppearanceAlert];
 
